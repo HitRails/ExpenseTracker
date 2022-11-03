@@ -1,4 +1,11 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+##Expense Tracker
+
+## Set up
+
+* Clone the repo.
+```
+  git clone https://github.com/HitRails/ExpenseTracker.git
+```
 
 ## Available Scripts
 

@@ -1,4 +1,5 @@
-import React, { useContext, createContext, useState, useMemo } from "react";
+import React, { useContext, useEffect, createContext, useState, useMemo } from "react";
+
 import styles from "./Notifications.module.css";
 
 const NotificationContext = createContext({
@@ -7,9 +8,19 @@ const NotificationContext = createContext({
 
 const typeClasses = {
   error: styles.error,
+  success: styles.success,
 };
 
 function Notification({ type, message, onClose }) {
+
+  useEffect(() => {
+    setTimer(5000);
+  });
+
+  const setTimer = (delay) => {
+    setTimeout(() => onClose(), delay);
+  };
+
   return (
     <div className={`${styles.notification} ${typeClasses[type]}`}>
       {message}
@@ -62,6 +73,7 @@ function useNotifications() {
   const context = useContext(NotificationContext);
   return {
     notifyError: (message) => context.notify({ type: "error", message }),
+    notifySuccess: (message) => context.notify({ type: "success", message }),
   };
 }
 

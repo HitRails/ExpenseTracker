@@ -6,10 +6,13 @@ import {
   Redirect,
   Link,
 } from "react-router-dom";
+
 import styles from "./App.module.css";
-import ExpensesPage from "./components/ExpensesPage";
-import ExpenseEdit from "./components/ExpenseEdit";
-import Notifications from "./components/Notifications";
+import ExpensesPage from "./components/ExpensesPage/ExpensesPage";
+import AccountsPage from "./components/AccountsPage/AccountsPage";
+import ExpenseEdit from "./components/ExpenseEdit/ExpenseEdit";
+import AccountEdit from "./components/AccountEdit/AccountEdit";
+import Notifications from "./hooks/Notifications/Notifications";
 
 function App() {
   return (
@@ -33,6 +36,7 @@ function App() {
 
           <main className={styles.main}>
             <Switch>
+              {/* Expense Routes */}
               <Route exact path={"/"}>
                 <Redirect to={"/expenses"} />
               </Route>
@@ -44,6 +48,17 @@ function App() {
               </Route>
               <Route exact path={"/expense/:id"}>
                 <ExpenseEdit />
+              </Route>
+
+              {/* Accounts Routes */}
+              <Route exact path={"/accounts"}>
+                <AccountsPage />
+              </Route>
+              <Route exact path={"/account/new"}>
+                <AccountEdit />
+              </Route>
+              <Route exact path={"/account/:id"}>
+                <AccountEdit />
               </Route>
             </Switch>
           </main>

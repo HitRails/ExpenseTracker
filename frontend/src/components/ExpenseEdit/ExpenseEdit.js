@@ -1,16 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
-import LoadingIndicator from "./LoadingIndicator";
-import ErrorMessage from "./ErrorMessage";
-import request from "../request";
+import { useParams, useHistory, Link } from "react-router-dom";
+
+import LoadingIndicator from "../shared/LoadingIndicator";
+import ErrorMessage from "../shared/ErrorMessage";
+import request from "../../request";
 import styles from "./ExpenseEdit.module.css";
-import Button from "./Button";
-import { useNotifications } from "./Notifications";
+import Button from "../shared/Button/Button";
+import { useNotifications } from "../../hooks/Notifications/Notifications";
 
 function ExpenseForm({ expense, onSave, disabled, onDelete }) {
   const [changes, setChanges] = useState({});
+  const [accounts, setAccounts] = useState([]);
+  const { notifyError } = useNotifications();
 
-  function changeField(field, value) {
+  useEffect(function () {
+    async function loadAccounts() {
+      try {
+        const response = await request("/accounts", {
+          method: "GET",
+        });
+        if (response.ok) {
+          setAccounts(response.body);
+          expense.id ?
+          changeField('account_id', expense.account.id) :
+          changeField('account_id', response.body[0].id);
+        } else {
+          notifyError("Failed to load Accounts");
+        }
+      } catch(error) {
+        notifyError("Failed to load Accounts");
+      }
+    }
+
+    loadAccounts();
+  }, [expense.id]);
+
+  function changeField(field, event) {
+    event.preventDefault();
+    const value = event.target.value;
     setChanges({
       ...changes,
       [field]: value,
@@ -38,8 +65,21 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
             id={"amount"}
             type={"number"}
             value={formData.amount}
-            onChange={(event) => changeField("amount", event.target.value)}
+            onChange={(event) => changeField("amount", event)}
           />
+        </div>
+
+        <div className={styles.formRow}>
+          <label htmlFor="account">Account</label>
+            <select required
+              value={formData.account_id}
+              onChange={(event) => changeField("account_id", event)}>
+              {
+                accounts.map((account
+                  ) => <option key={account.id} value={account.id}>{account.name}</option>
+                )
+              }
+            </select>
         </div>
 
         <div className={styles.formRow}>
@@ -49,7 +89,7 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
             id={"date"}
             type={"date"}
             value={formData.date}
-            onChange={(event) => changeField("date", event.target.value)}
+            onChange={(event) => changeField("date", event)}
           />
         </div>
 
@@ -60,23 +100,26 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
             id={"description"}
             type={"text"}
             value={formData.description}
-            onChange={(event) => changeField("description", event.target.value)}
+            onChange={(event) => changeField("description", event)}
           />
         </div>
       </fieldset>
 
       <div className={styles.formFooter}>
-        {expense.id && (
-          <Button action={onDelete} kind={"danger"} disabled={disabled}>
-            Delete
+        <p>Do not have an account? {<Link to={"/account/new"}>Create one</Link>} </p>
+        <div>
+          {expense.id && (
+            <Button action={onDelete} kind={"danger"} disabled={disabled}>
+              Delete
+            </Button>
+          )}
+          <Button
+            type={"submit"}
+            disabled={Object.keys(changes).length === 0 || disabled}
+          >
+            Save
           </Button>
-        )}
-        <Button
-          type={"submit"}
-          disabled={Object.keys(changes).length === 0 || disabled}
-        >
-          Save
-        </Button>
+        </div>
       </div>
     </form>
   );
@@ -85,6 +128,7 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
 const defaultExpenseData = {
   amount: 0,
   date: new Date().toISOString().substr(0, 10),
+  account_id: null,
   description: "",
 };
 
@@ -95,7 +139,7 @@ function ExpenseEdit() {
   const [loadingStatus, setLoadingStatus] = useState(id ? "loading" : "loaded");
   const [isSaving, setSaving] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
-  const { notifyError } = useNotifications();
+  const { notifyError, notifySuccess } = useNotifications();
 
   useEffect(
     function () {
@@ -133,8 +177,12 @@ function ExpenseEdit() {
         body,
       });
       if (response.ok) {
-        setExpense(response.body);
+        const message = expense.id ? 'Expense is updated successfully' : 'Expense is created successfully';
+        notifySuccess(message);
+        history.push('/expenses');
       } else {
+        response.body.error ?
+        notifyError(response.body.error) :
         notifyError("Failed to save expense. Please try again");
       }
     } catch (error) {
@@ -154,6 +202,7 @@ function ExpenseEdit() {
       });
       if (response.ok) {
         history.push("/expenses");
+        notifySuccess('Expense Deleted Successfully');
       } else {
         notifyError("Failed to delete expense. Please try again");
       }

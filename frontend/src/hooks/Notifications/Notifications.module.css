@@ -17,11 +17,16 @@
   cursor: pointer;
 }
 
+.success {
+  background: #198754;
+  color: #ffffff;
+}
+
 .error {
   background: #a41b1b;
   color: #ffffff;
 }
 
-.error svg polygon {
+.error, .success svg polygon {
   fill: #ffffff;
 }

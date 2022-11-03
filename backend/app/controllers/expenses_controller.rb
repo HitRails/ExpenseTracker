@@ -1,37 +1,48 @@
 class ExpensesController < ApplicationController
-  rescue_from ActiveRecord::RecordInvalid do |error|
-    expense = error.record
-    render json: expense.errors, status: :bad_request
-  end
+  before_action :find_expense, only: [:show, :update, :destroy]
 
   def index
-    render json: Expense.order(date: :desc)
+    expenses = Expense.order(date: :desc)
+    render json: expenses, collection_serializer: ExpenseSerializer
   end
 
   def show
-    expense = Expense.find(params[:id])
-    render json: expense
+    render json: @expense, each_serializer: ExpenseSerializer
   end
 
   def create
-    expense = Expense.create!(expense_params)
-    render json: expense
+    expense = Expense.new(expense_params)
+    if expense.save
+      render json: expense, each_serializer: ExpenseSerializer
+    else
+      render json: { error: expense.errors.full_messages.first }, status: :unprocessable_entity
+    end
   end
 
   def update
-    expense = Expense.find(params[:id])
-    expense.update!(expense_params)
-    render json: expense
+    if @expense.update(expense_params)
+      render json: @expense, each_serializer: ExpenseSerializer
+    else
+      render json: { error: @expense.errors.full_messages.first }, status: :unprocessable_entity
+    end
   end
 
   def destroy
-    expense = Expense.find(params[:id])
-    expense.destroy
+    if @expense.destroy
+      render json: @expense, each_serializer: ExpenseSerializer
+    else
+      render json: {message: 'Expense Not Deleted.' }, status: :unprocessable_entity
+    end
   end
 
   private
 
   def expense_params
-    params.permit(:amount, :date, :description)
+    params.permit(:amount, :date, :description, :account_id)
+  end
+
+  def find_expense
+    @expense = Expense.find(params[:id])
+    return render json: {message: 'Expense Not Found.'}, status: 404 unless @expense.present?
   end
 end

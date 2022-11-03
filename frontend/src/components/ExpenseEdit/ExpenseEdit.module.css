@@ -1,0 +1,47 @@
+.form {
+  overflow: hidden;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  background: #fff;
+}
+
+.form fieldset {
+  border: none;
+  padding: 20px;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding: 10px 20px;
+}
+
+.formRow {
+  display: flex;
+  margin: 20px 0;
+  align-items: center;
+}
+
+.formRow label {
+  width: 120px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  padding: 8px;
+  height: 30px;
+  width: 250px;
+  border: 1px solid #bebebe;
+  border-radius: 4px;
+  background: #fff;
+  outline: none;
+}
+
+select {
+  width: 270px;
+  height: 50px;
+}

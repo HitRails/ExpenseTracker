@@ -1,24 +1,38 @@
-# README
+# Expense Tracker
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Table of contents
 
-Things you may want to cover:
+* Dependencies
+* Set up
+* Contributing
+* Branches
 
-* Ruby version
+## Dependencies
 
-* System dependencies
+* Ruby '2.6.6'
+* Rails '~>6.0.3'
+* Database: sqlite3
 
-* Configuration
+## Set up
 
-* Database creation
+* Clone the repo.
+```
+    git clone https://github.com/HitRails/ExpenseTracker.git
+```
 
-* Database initialization
+* Install dependencies
+```
+  cd ExpenseTracker
+  bundle install
+```
 
-* How to run the test suite
+* Create database.
 
-* Services (job queues, cache servers, search engines, etc.)
+```
+    rails db:create
+```
+* Migrate database.
 
-* Deployment instructions
-
-* ...
+```
+    rails db:migrate
+```
