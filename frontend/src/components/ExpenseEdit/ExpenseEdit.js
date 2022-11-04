@@ -22,8 +22,8 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
         if (response.ok) {
           setAccounts(response.body);
           expense.id ?
-          changeField('account_id', expense.account.id) :
-          changeField('account_id', response.body[0].id);
+          setFieldChanges('account_id', expense.account.id) :
+          setFieldChanges('account_id', response.body[0].id);
         } else {
           notifyError("Failed to load Accounts");
         }
@@ -38,6 +38,10 @@ function ExpenseForm({ expense, onSave, disabled, onDelete }) {
   function changeField(field, event) {
     event.preventDefault();
     const value = event.target.value;
+    setFieldChanges(field, value);
+  }
+
+  function setFieldChanges(field, value) {
     setChanges({
       ...changes,
       [field]: value,
